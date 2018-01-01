@@ -105,8 +105,8 @@ func main() {
 		w.Write(b)
 	})
 
-	log.Infof("Listening on %v:%v", "0.0.0.0", "8000")
-	http.ListenAndServe("0.0.0.0:8000", mux)
+	log.Infof("Listening on %v:%v", "0.0.0.0", "4567")
+	http.ListenAndServe("0.0.0.0:4567", mux)
 }
 
 func proxyURL(reqURL *url.URL) (*url.URL, error) {
