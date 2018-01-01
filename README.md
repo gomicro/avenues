@@ -12,7 +12,28 @@ Docker
 
 # Usage
 
+## Configuration
+The configuration always looks to read from a `routes.yaml` file.  It expects two segments, a services map, and a routes map.
+
+The services map provides an easier shorthand name to the actual docker provided DNS entry for use in the routes map.
+
+The routes map is a reference of endpoints to services by name.  The endpoints are treated as the root of the endpoint, so all sub paths of the routes specified will direct to those routes as well.  i.e. `/v1/teams` will mathc for `/v1/teams`, `/v1/teams/{teamID}`, `/v1/teams/{teamID}/admin`, and so on.
+
+```
+services:
+  service1: 'http://service1:4567'
+  service2: 'http://service2:4567'
+  service3: 'http://service3:4567'
+routes:
+  "/v1/projects": "service1"
+  "/v1/users": "service2"
+  "/v1/teams": "service2"
+  "/v1/posts": "service3"
+```
+
+## Running
 Avenues is intended to be used in conjunction with local Docker testing of a service.
+
 ```
 docker pull gomicro/avenues
 docker run -it -v $PWD/routes.yaml:/routes.yaml gomicro/avenues
