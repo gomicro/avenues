@@ -3,7 +3,7 @@ go:
   - 1.8
   - tip
 script:
-  - make test build dockerize
+  - make build test dockerize
   - if [ "$TRAVIS_BRANCH" == "master" ]; then make deploy_image; fi
 notifications:
   email: false
