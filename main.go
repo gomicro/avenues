@@ -14,6 +14,11 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const (
+	defaultConfigFile = "./routes.yaml"
+	configFileEnv     = "AVENUES_CONFIG_FILE"
+)
+
 type configuration struct {
 	Services map[string]string `yaml:"services"`
 	Routes   map[string]string `yaml:"routes"`
@@ -25,7 +30,24 @@ var (
 )
 
 func init() {
-	b, err := ioutil.ReadFile("./routes.yaml")
+	readConfigFile()
+
+	client = &http.Client{
+		Transport: &http.Transport{
+			MaxIdleConnsPerHost: 50,
+			MaxIdleConns:        50,
+		},
+	}
+}
+
+func readConfigFile() {
+	configFile := os.Getenv(configFileEnv)
+
+	if configFile == "" {
+		configFile = defaultConfigFile
+	}
+
+	b, err := ioutil.ReadFile(configFile)
 	if err != nil {
 		log.Errorf("Failed to read config file: %v", err.Error())
 		os.Exit(1)
@@ -35,13 +57,6 @@ func init() {
 	if err != nil {
 		log.Errorf("Failed to unmarshal config file: %v", err.Error())
 		os.Exit(1)
-	}
-
-	client = &http.Client{
-		Transport: &http.Transport{
-			MaxIdleConnsPerHost: 50,
-			MaxIdleConns:        50,
-		},
 	}
 }
 
