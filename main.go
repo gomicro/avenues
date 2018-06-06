@@ -32,7 +32,7 @@ var (
 	config configuration
 )
 
-func init() {
+func configure() {
 	readConfigFile()
 
 	pool := x509.NewCertPool()
@@ -75,6 +75,8 @@ func readConfigFile() {
 }
 
 func main() {
+	configure()
+
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
