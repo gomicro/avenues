@@ -2,6 +2,8 @@ package main
 
 import (
 	"bytes"
+	"crypto/tls"
+	"crypto/x509"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -22,6 +24,7 @@ const (
 type configuration struct {
 	Services map[string]string `yaml:"services"`
 	Routes   map[string]string `yaml:"routes"`
+	CA       string            `yaml:"ca"`
 }
 
 var (
@@ -32,10 +35,21 @@ var (
 func init() {
 	readConfigFile()
 
+	pool := x509.NewCertPool()
+
+	if config.CA != "" {
+		ok := pool.AppendCertsFromPEM([]byte(config.CA))
+		if !ok {
+			log.Fatal("Failed to append CA(s) to cert pool")
+			os.Exit(1)
+		}
+	}
+
 	client = &http.Client{
 		Transport: &http.Transport{
 			MaxIdleConnsPerHost: 50,
 			MaxIdleConns:        50,
+			TLSClientConfig:     &tls.Config{RootCAs: pool},
 		},
 	}
 }
