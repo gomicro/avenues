@@ -1,7 +1,7 @@
 language: go
 go:
   - 1.8
-  - tip
+  - master
 script:
   - make build test dockerize
   - if [ "$TRAVIS_BRANCH" == "master" ]; then make deploy_image; fi
