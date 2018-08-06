@@ -24,6 +24,7 @@ const (
 type configuration struct {
 	Services map[string]string `yaml:"services"`
 	Routes   map[string]string `yaml:"routes"`
+	Status   string            `yaml:"status"`
 	CA       string            `yaml:"ca"`
 }
 
@@ -71,6 +72,10 @@ func readConfigFile() {
 	if err != nil {
 		log.Errorf("Failed to unmarshal config file: %v", err.Error())
 		os.Exit(1)
+	}
+
+	if config.Status == "" {
+		config.Status = "/avenues/status"
 	}
 }
 
@@ -134,6 +139,11 @@ func main() {
 
 		w.WriteHeader(resp.StatusCode)
 		w.Write(b)
+	})
+
+	mux.HandleFunc(config.Status, func(w http.ResponseWriter, req *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("avenues is functioning"))
 	})
 
 	log.Infof("Listening on %v:%v", "0.0.0.0", "4567")
