@@ -87,8 +87,8 @@ func main() {
 	mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
 		u, err := proxyURL(req.URL)
 		if err != nil {
+			log.Warnf("failed to proxy url: %v", err.Error())
 			w.WriteHeader(http.StatusNotFound)
-			w.Write([]byte("not found"))
 			return
 		}
 
@@ -96,15 +96,16 @@ func main() {
 			defer req.Body.Close()
 		}
 
-		//TODO: stream instead of read all?
 		reqBody, err := ioutil.ReadAll(req.Body)
 		if err != nil {
+			log.Errorf("failed to read request body: %v", err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
 		proxyReq, err := http.NewRequest(req.Method, u.String(), bytes.NewBuffer(reqBody))
 		if err != nil {
+			log.Errorf("failed to create proxy request: %v", err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -113,6 +114,7 @@ func main() {
 
 		resp, err := client.Do(proxyReq)
 		if err != nil {
+			log.Errorf("failed to do proxy request: %v", err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -121,9 +123,9 @@ func main() {
 			defer resp.Body.Close()
 		}
 
-		//TODO: stream instead of read all?
 		b, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
+			log.Errorf("failed to read response body: %v", err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
