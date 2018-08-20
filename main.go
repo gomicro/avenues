@@ -141,6 +141,8 @@ func main() {
 
 		w.WriteHeader(resp.StatusCode)
 		w.Write(b)
+
+		log.Infof("proxyed '%v' to '%v'", req.URL, u.String())
 	})
 
 	mux.HandleFunc(config.Status, func(w http.ResponseWriter, req *http.Request) {
