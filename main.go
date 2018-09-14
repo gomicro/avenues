@@ -85,6 +85,19 @@ func main() {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
+		if req.Method == "OPTIONS" {
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+			w.Header().Set("Access-Control-Allow-Methods", "*")
+			w.Header().Set("Access-Control-Allow-Headers", "*")
+			w.Header().Set("Access-Control-Max-Age", "60")
+
+			w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate, post-check=0, pre-check=0")
+
+			w.Header().Set("Vary", "Accept-Encoding")
+
+			return
+		}
+
 		u, err := proxyURL(req.URL)
 		if err != nil {
 			log.Warnf("failed to proxy url: %v", err.Error())
