@@ -29,6 +29,10 @@ routes:
   "/v1/users": "service2"
   "/v1/teams": "service2"
   "/v1/posts": "service3"
+{optional}
+status: "/a/custom/path/for/status"
+ca: "a custom CA to include for SSL"
+{optional}
 ```
 
 ## Running
