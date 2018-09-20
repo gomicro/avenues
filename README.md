@@ -21,6 +21,7 @@ The routes map is a reference of endpoints to services by name.  The endpoints a
 
 ```
 services:
+  default: 'http://adefaultpaht' # Optional
   service1: 'http://service1:4567'
   service2: 'http://service2:4567'
   service3: 'http://service3:4567'
@@ -29,10 +30,8 @@ routes:
   "/v1/users": "service2"
   "/v1/teams": "service2"
   "/v1/posts": "service3"
-{optional}
-status: "/a/custom/path/for/status"
-ca: "a custom CA to include for SSL"
-{optional}
+status: "/a/custom/path/for/status" # Optional
+ca: "a custom CA to include for SSL" # Optional
 ```
 
 ## Running
