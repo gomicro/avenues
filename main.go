@@ -170,7 +170,11 @@ func main() {
 func proxyURL(reqURL *url.URL) (*url.URL, error) {
 	serviceName, ok := pathToServiceName(reqURL.Path)
 	if !ok {
-		return nil, fmt.Errorf("service name not found for url: %v", reqURL.Path)
+		serviceName = "default"
+		_, ok := config.Services["default"]
+		if !ok {
+			return nil, fmt.Errorf("service name not found for url: %v", reqURL.Path)
+		}
 	}
 
 	serviceAddress, ok := config.Services[serviceName]
