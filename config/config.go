@@ -3,7 +3,9 @@ package config
 import (
 	"fmt"
 	"io/ioutil"
+	"net/url"
 	"os"
+	"strings"
 
 	"gopkg.in/yaml.v2"
 )
@@ -50,4 +52,48 @@ func ParseFromFile() (*File, error) {
 	}
 
 	return &conf, nil
+}
+
+func (f *File) ServiceURL(reqURL *url.URL) (*url.URL, error) {
+	serviceName, ok := f.pathToServiceName(reqURL.Path)
+	if !ok {
+		serviceName = "default"
+		_, ok := f.Services["default"]
+		if !ok {
+			return nil, fmt.Errorf("service name not found for url: %v", reqURL.Path)
+		}
+	}
+
+	serviceAddress, ok := f.Services[serviceName]
+	if !ok {
+		return nil, fmt.Errorf("service address not found for name: %v", serviceName)
+	}
+
+	u, err := url.Parse(serviceAddress)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse service address")
+	}
+
+	u.Path = reqURL.Path
+	u.RawQuery = reqURL.Query().Encode()
+
+	return u, nil
+}
+
+func (f *File) pathToServiceName(path string) (string, bool) {
+	for route, serviceName := range f.Routes {
+		if strings.HasPrefix(trailingSlash(path), route) {
+			return serviceName, true
+		}
+	}
+
+	return "", false
+}
+
+func trailingSlash(path string) string {
+	if !strings.HasSuffix(path, "/") {
+		return fmt.Sprintf("%v/", path)
+	}
+
+	return path
 }
