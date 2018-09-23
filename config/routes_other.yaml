@@ -1,0 +1,5 @@
+---
+services:
+  baz: http://baz:4567
+routes:
+  /v1/baz: baz

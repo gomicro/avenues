@@ -1,50 +1,44 @@
 package main
 
 import (
-	"bytes"
 	"crypto/tls"
 	"crypto/x509"
-	"fmt"
-	"io/ioutil"
 	"net/http"
-	"net/url"
+	"net/http/httputil"
 	"os"
-	"strings"
 
+	"github.com/gomicro/avenues/config"
 	log "github.com/gomicro/ledger"
-
-	"gopkg.in/yaml.v2"
 )
-
-const (
-	defaultConfigFile = "./routes.yaml"
-	configFileEnv     = "AVENUES_CONFIG_FILE"
-)
-
-type configuration struct {
-	Services map[string]string `yaml:"services"`
-	Routes   map[string]string `yaml:"routes"`
-	Status   string            `yaml:"status"`
-	CA       string            `yaml:"ca"`
-}
 
 var (
-	client *http.Client
-	config configuration
+	client  *http.Client
+	pool    *x509.CertPool
+	conf    *config.File
+	proxies map[string]*httputil.ReverseProxy
 )
 
 func configure() {
-	readConfigFile()
+	c, err := config.ParseFromFile()
+	if err != nil {
+		log.Fatalf("Failed to read config file: %v", err.Error())
+		os.Exit(1)
+	}
 
-	pool := x509.NewCertPool()
+	conf = c
+	log.Debug("Config file parsed")
 
-	if config.CA != "" {
-		ok := pool.AppendCertsFromPEM([]byte(config.CA))
+	pool = x509.NewCertPool()
+
+	if conf.CA != "" {
+		ok := pool.AppendCertsFromPEM([]byte(conf.CA))
 		if !ok {
 			log.Fatal("Failed to append CA(s) to cert pool")
 			os.Exit(1)
 		}
 	}
+
+	log.Debug("CA configured")
 
 	client = &http.Client{
 		Transport: &http.Transport{
@@ -53,160 +47,78 @@ func configure() {
 			TLSClientConfig:     &tls.Config{RootCAs: pool},
 		},
 	}
-}
 
-func readConfigFile() {
-	configFile := os.Getenv(configFileEnv)
+	log.Debug("HTTP client configured")
 
-	if configFile == "" {
-		configFile = defaultConfigFile
-	}
+	proxies = make(map[string]*httputil.ReverseProxy)
 
-	b, err := ioutil.ReadFile(configFile)
-	if err != nil {
-		log.Errorf("Failed to read config file: %v", err.Error())
-		os.Exit(1)
-	}
-
-	err = yaml.Unmarshal(b, &config)
-	if err != nil {
-		log.Errorf("Failed to unmarshal config file: %v", err.Error())
-		os.Exit(1)
-	}
-
-	if config.Status == "" {
-		config.Status = "/avenues/status"
-	}
+	log.Debug("Configuration complete")
 }
 
 func main() {
 	configure()
 
-	mux := http.NewServeMux()
-
-	mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
-		if req.Method == "OPTIONS" {
-			w.Header().Set("Access-Control-Allow-Origin", "*")
-			w.Header().Set("Access-Control-Allow-Methods", "*")
-			w.Header().Set("Access-Control-Allow-Headers", "*")
-			w.Header().Set("Access-Control-Max-Age", "60")
-
-			w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate, post-check=0, pre-check=0")
-
-			w.Header().Set("Vary", "Accept-Encoding")
-
-			return
-		}
-
-		u, err := proxyURL(req.URL)
-		if err != nil {
-			log.Warnf("failed to proxy url: %v", err.Error())
-			w.WriteHeader(http.StatusNotFound)
-			return
-		}
-
-		if req.Body != nil {
-			defer req.Body.Close()
-		}
-
-		reqBody, err := ioutil.ReadAll(req.Body)
-		if err != nil {
-			log.Errorf("failed to read request body: %v", err.Error())
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		proxyReq, err := http.NewRequest(req.Method, u.String(), bytes.NewBuffer(reqBody))
-		if err != nil {
-			log.Errorf("failed to create proxy request: %v", err.Error())
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		proxyReq.Header = req.Header
-
-		resp, err := client.Do(proxyReq)
-		if err != nil {
-			log.Errorf("failed to do proxy request: %v", err.Error())
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		if resp.Body != nil {
-			defer resp.Body.Close()
-		}
-
-		b, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			log.Errorf("failed to read response body: %v", err.Error())
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		for k, v := range resp.Header {
-			w.Header().Set(k, strings.Join(v, ""))
-		}
-
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "*")
-		w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate, post-check=0, pre-check=0")
-		w.Header().Set("Vary", "Accept-Encoding")
-
-		w.WriteHeader(resp.StatusCode)
-		w.Write(b)
-
-		log.Infof("proxyed '%v' to '%v'", req.URL, u.String())
-	})
-
-	mux.HandleFunc(config.Status, func(w http.ResponseWriter, req *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("avenues is functioning"))
-	})
-
 	log.Infof("Listening on %v:%v", "0.0.0.0", "4567")
-	http.ListenAndServe("0.0.0.0:4567", mux)
+	http.ListenAndServe("0.0.0.0:4567", newProxy())
 }
 
-func proxyURL(reqURL *url.URL) (*url.URL, error) {
-	serviceName, ok := pathToServiceName(reqURL.Path)
-	if !ok {
-		serviceName = "default"
-		_, ok := config.Services["default"]
-		if !ok {
-			return nil, fmt.Errorf("service name not found for url: %v", reqURL.Path)
-		}
+type proxy struct {
+}
+
+func newProxy() *proxy {
+	return &proxy{}
+}
+
+func (p *proxy) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	if req.Method == "OPTIONS" {
+		req.Header.Set("Access-Control-Allow-Origin", "*")
+		req.Header.Set("Access-Control-Allow-Methods", "*")
+		req.Header.Set("Access-Control-Allow-Headers", "*")
+		req.Header.Set("Access-Control-Max-Age", "60")
+		req.Header.Set("Cache-Control", "no-store, no-cache, must-revalidate, post-check=0, pre-check=0")
+		req.Header.Set("Vary", "Accept-Encoding")
+
+		return
 	}
 
-	serviceAddress, ok := config.Services[serviceName]
-	if !ok {
-		return nil, fmt.Errorf("service address not found for name: %v", serviceName)
+	if req.URL.Path == conf.Status {
+		handleStatus(w, req)
+		return
 	}
 
-	u, err := url.Parse(serviceAddress)
+	u, err := conf.ServiceURL(req.URL)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse service address")
+		log.Warnf("failed to proxy url: %v", err.Error())
+		w.WriteHeader(http.StatusNotFound)
+		return
 	}
 
-	u.Path = reqURL.Path
-	u.RawQuery = reqURL.Query().Encode()
+	rp := httputil.ReverseProxy{
+		Director: func(req *http.Request) {
+			req.Header.Add("X-Forwarded-Host", req.Host)
+			req.Header.Add("X-Origin-Host", u.Host)
 
-	return u, nil
+			req.URL.Scheme = u.Scheme
+			req.URL.Host = u.Host
+			req.URL.Path = u.Path
+		},
+		ModifyResponse: func(resp *http.Response) error {
+			resp.Header.Set("Access-Control-Allow-Origin", "*")
+			resp.Header.Set("Access-Control-Allow-Methods", "*")
+			resp.Header.Set("Access-Control-Allow-Headers", "*")
+			resp.Header.Set("Access-Control-Max-Age", "60")
+			resp.Header.Set("Cache-Control", "no-store, no-cache, must-revalidate, post-check=0, pre-check=0")
+			resp.Header.Set("Vary", "Accept-Encoding")
+
+			return nil
+		},
+	}
+
+	rp.ServeHTTP(w, req)
+	log.Infof("proxyed '%v' to '%v'", req.URL, u.String())
 }
 
-func pathToServiceName(path string) (string, bool) {
-	for route, serviceName := range config.Routes {
-		if strings.HasPrefix(trailingSlash(path), route) {
-			return serviceName, true
-		}
-	}
-
-	return "", false
-}
-
-func trailingSlash(path string) string {
-	if !strings.HasSuffix(path, "/") {
-		return fmt.Sprintf("%v/", path)
-	}
-
-	return path
+func handleStatus(w http.ResponseWriter, req *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("avenues is functioning"))
 }

@@ -1,0 +1,7 @@
+---
+services:
+  foo: http://foo:4567
+  bar: http://bar:4567
+routes:
+  /v1/foo: foo
+  /v1/bar: bar
