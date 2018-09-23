@@ -71,12 +71,12 @@ func newProxy() *proxy {
 
 func (p *proxy) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	if req.Method == "OPTIONS" {
-		req.Header.Set("Access-Control-Allow-Origin", "*")
-		req.Header.Set("Access-Control-Allow-Methods", "*")
-		req.Header.Set("Access-Control-Allow-Headers", "*")
-		req.Header.Set("Access-Control-Max-Age", "60")
-		req.Header.Set("Cache-Control", "no-store, no-cache, must-revalidate, post-check=0, pre-check=0")
-		req.Header.Set("Vary", "Accept-Encoding")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "*")
+		w.Header().Set("Access-Control-Max-Age", "60")
+		w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate, post-check=0, pre-check=0")
+		w.Header().Set("Vary", "Accept-Encoding")
 
 		return
 	}
