@@ -2,10 +2,69 @@
 
 
 [[projects]]
+  name = "github.com/franela/goblin"
+  packages = ["."]
+  revision = "cd5d08fb4ede9eaac1812fdb513552e7404eae2e"
+  version = "0.0.2"
+
+[[projects]]
   name = "github.com/gomicro/ledger"
   packages = ["."]
   revision = "a4b2abae8d06f0f87fd79dc9048f6b156345e727"
   version = "v0.0.4"
+
+[[projects]]
+  name = "github.com/onsi/gomega"
+  packages = [
+    ".",
+    "format",
+    "internal/assertion",
+    "internal/asyncassertion",
+    "internal/oraclematcher",
+    "internal/testingtsupport",
+    "matchers",
+    "matchers/support/goraph/bipartitegraph",
+    "matchers/support/goraph/edge",
+    "matchers/support/goraph/node",
+    "matchers/support/goraph/util",
+    "types"
+  ]
+  revision = "7615b9433f86a8bdf29709bf288bc4fd0636a369"
+  version = "v1.4.2"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/net"
+  packages = [
+    "html",
+    "html/atom",
+    "html/charset"
+  ]
+  revision = "2f5d2388922f370f4355f327fcf4cfe9f5583908"
+
+[[projects]]
+  name = "golang.org/x/text"
+  packages = [
+    "encoding",
+    "encoding/charmap",
+    "encoding/htmlindex",
+    "encoding/internal",
+    "encoding/internal/identifier",
+    "encoding/japanese",
+    "encoding/korean",
+    "encoding/simplifiedchinese",
+    "encoding/traditionalchinese",
+    "encoding/unicode",
+    "internal/gen",
+    "internal/tag",
+    "internal/utf8internal",
+    "language",
+    "runes",
+    "transform",
+    "unicode/cldr"
+  ]
+  revision = "f21a4dfb5e38f5895301dc265a8def02365cc3d0"
+  version = "v0.3.0"
 
 [[projects]]
   branch = "v2"
@@ -16,6 +75,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "54062464fdc4cb0c81421064f455691d2de57709e9fd647fea407aade5dfb42d"
+  inputs-digest = "cc0682cf4b407734f3db8e4d3b50a19fc43b90f8f8d8b6fd524a64531938449e"
   solver-name = "gps-cdcl"
   solver-version = 1
