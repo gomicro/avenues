@@ -12,9 +12,9 @@ import (
 )
 
 var (
-	client  *http.Client
-	conf    *config.File
-	proxies map[string]*httputil.ReverseProxy
+	transport *http.Transport
+	conf      *config.File
+	proxies   map[string]*httputil.ReverseProxy
 )
 
 func configure() {
@@ -38,15 +38,13 @@ func configure() {
 	}
 	log.Debug("CA configured")
 
-	client = &http.Client{
-		Transport: &http.Transport{
-			MaxIdleConnsPerHost: 50,
-			MaxIdleConns:        50,
-			TLSClientConfig:     &tls.Config{RootCAs: pool},
-		},
+	transport = &http.Transport{
+		MaxIdleConnsPerHost: 50,
+		MaxIdleConns:        50,
+		TLSClientConfig:     &tls.Config{RootCAs: pool},
 	}
 
-	log.Debug("HTTP client configured")
+	log.Debug("HTTP transport configured")
 
 	proxies = make(map[string]*httputil.ReverseProxy)
 
@@ -100,6 +98,7 @@ func (p *proxy) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			req.URL.Host = u.Host
 			req.URL.Path = u.Path
 		},
+		Transport: transport,
 		ModifyResponse: func(resp *http.Response) error {
 			resp.Header.Set("Access-Control-Allow-Origin", "*")
 			resp.Header.Set("Access-Control-Allow-Methods", "*")
