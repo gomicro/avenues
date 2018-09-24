@@ -13,7 +13,6 @@ import (
 
 var (
 	client  *http.Client
-	pool    *x509.CertPool
 	conf    *config.File
 	proxies map[string]*httputil.ReverseProxy
 )
@@ -28,16 +27,15 @@ func configure() {
 	conf = c
 	log.Debug("Config file parsed")
 
-	pool = x509.NewCertPool()
-
+	pool := x509.NewCertPool()
 	if conf.CA != "" {
 		ok := pool.AppendCertsFromPEM([]byte(conf.CA))
 		if !ok {
 			log.Fatal("Failed to append CA(s) to cert pool")
 			os.Exit(1)
 		}
+		log.Debug("Custom CA configured")
 	}
-
 	log.Debug("CA configured")
 
 	client = &http.Client{
