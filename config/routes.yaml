@@ -1,7 +1,14 @@
 ---
-services:
-  foo: http://foo:4567
-  bar: http://bar:4567
 routes:
-  /v1/foo: foo
-  /v1/bar: bar
+  /v1/foo:
+    backend: http://foo:4567
+  /v1/bar:
+    backend: http://foo:4567
+  /v1/static:
+    type: static
+    backend: http://static:4567
+  /v1/ordinal:
+    type: ordinal
+    backends:
+      - http://static:4567
+      - http://ordinal:4567
