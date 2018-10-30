@@ -1,5 +1,4 @@
 ---
-services:
-  baz: http://baz:4567
 routes:
-  /v1/baz: baz
+  /v1/baz:
+    backend: http://baz:4567
