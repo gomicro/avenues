@@ -15,7 +15,7 @@ Docker
 ## Configuration
 The configuration always looks to read from a `routes.yaml` file.  It expects one segment, definition of given routes.
 
-The endpoints are treated as the root of the endpoint, so all sub paths of the routes specified will direct to those routes as well.  i.e. `/v1/teams` will mathc for `/v1/teams`, `/v1/teams/{teamID}`, `/v1/teams/{teamID}/admin`, and so on.
+The endpoints are treated as the root of the endpoint, so all sub paths of the routes specified will direct to those routes as well.  i.e. `/v1/teams` will match for `/v1/teams`, `/v1/teams/{teamID}`, `/v1/teams/{teamID}/admin`, and so on.
 
 ```
 routes:
