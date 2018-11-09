@@ -32,6 +32,7 @@ routes:
       - "http://service3:4567"
       - "http://anothermockofservice3:4567"
       - "http://mockfailureservice:4567"
+reset: "/a/custom/path/for/reset" # Optional
 status: "/a/custom/path/for/status" # Optional
 ca: "a custom CA to include for SSL" # Optional
 ```
