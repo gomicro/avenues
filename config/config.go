@@ -17,6 +17,7 @@ import (
 
 const (
 	defaultStatusEndpoint = "/avenues/status"
+	defaultResetEndpoint  = "/avenues/reset"
 	defaultConfigFile     = "./routes.yaml"
 
 	configFileEnv = "AVENUES_CONFIG_FILE"
@@ -25,6 +26,7 @@ const (
 // File represents all the configurable options of Avenues
 type File struct {
 	Routes    map[string]*Route                 `yaml:"routes"`
+	Reset     string                            `yaml:"reset"`
 	Status    string                            `yaml:"status"`
 	CA        string                            `yaml:"ca"`
 	proxies   map[string]*httputil.ReverseProxy `yaml:"-"`
@@ -55,6 +57,10 @@ func ParseFromFile() (*File, error) {
 
 	if conf.Status == "" {
 		conf.Status = defaultStatusEndpoint
+	}
+
+	if conf.Reset == "" {
+		conf.Reset = defaultResetEndpoint
 	}
 
 	conf.proxies = make(map[string]*httputil.ReverseProxy)
@@ -91,8 +97,12 @@ func (f *File) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if req.URL.Path == f.Status {
+	switch req.URL.Path {
+	case f.Status:
 		handleStatus(w, req)
+		return
+	case f.Reset:
+		f.handleReset(w, req)
 		return
 	}
 
@@ -127,6 +137,14 @@ func (f *File) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	rp.ServeHTTP(w, req)
 	log.Infof("proxyed '%v' to '%v'", req.URL, u.String())
+}
+
+func (f *File) handleReset(w http.ResponseWriter, req *http.Request) {
+	for _, r := range f.Routes {
+		r.reset()
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("routes have been reset"))
 }
 
 func handleStatus(w http.ResponseWriter, req *http.Request) {
@@ -201,4 +219,8 @@ type Route struct {
 	Backend  string   `yaml:"backend,omitempty"`
 	index    int      `yaml:"-"`
 	Backends []string `yaml:"backends,omitempty"`
+}
+
+func (r *Route) reset() {
+	r.index = 0
 }
