@@ -5,6 +5,7 @@ go:
 script:
   - make build test dockerize
   - if [ "$TRAVIS_BRANCH" == "master" ]; then make deploy_image; fi
+  - if [ -n "$TRAVIS_TAG" ]; then DOCKER_IMAGE_LABEL=$TRAVIS_TAG make dockerize deploy_image; fi
 notifications:
   email: false
 services:
