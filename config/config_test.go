@@ -68,7 +68,7 @@ func TestConfig(t *testing.T) {
 
 				Expect(res.Header.Get("Access-Control-Allow-Origin")).To(Equal("*"))
 				Expect(res.Header.Get("Access-Control-Allow-Methods")).To(Equal("*"))
-				Expect(res.Header.Get("Access-Control-Allow-Headers")).To(Equal("*"))
+				Expect(res.Header.Get("Access-Control-Allow-Headers")).To(Equal("*, Authorization"))
 				Expect(res.Header.Get("Access-Control-Max-Age")).To(Equal("60"))
 				Expect(res.Header.Get("Cache-Control")).To(Equal("no-store, no-cache, must-revalidate, post-check=0, pre-check=0"))
 				Expect(res.Header.Get("Vary")).To(Equal("Accept-Encoding"))
