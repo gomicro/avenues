@@ -88,7 +88,7 @@ func (f *File) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "*")
-		w.Header().Set("Access-Control-Allow-Headers", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "*, Authorization")
 		w.Header().Set("Access-Control-Max-Age", "60")
 		w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate, post-check=0, pre-check=0")
 		w.Header().Set("Vary", "Accept-Encoding")
@@ -126,7 +126,7 @@ func (f *File) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		ModifyResponse: func(resp *http.Response) error {
 			resp.Header.Set("Access-Control-Allow-Origin", "*")
 			resp.Header.Set("Access-Control-Allow-Methods", "*")
-			resp.Header.Set("Access-Control-Allow-Headers", "*")
+			resp.Header.Set("Access-Control-Allow-Headers", "*, Authorization")
 			resp.Header.Set("Access-Control-Max-Age", "60")
 			resp.Header.Set("Cache-Control", "no-store, no-cache, must-revalidate, post-check=0, pre-check=0")
 			resp.Header.Set("Vary", "Accept-Encoding")
