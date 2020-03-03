@@ -34,6 +34,8 @@ routes:
       - "http://mockfailureservice:4567"
 reset: "/a/custom/path/for/reset" # Optional
 status: "/a/custom/path/for/status" # Optional
+cert: "cert for serving ssl" # Optional
+key: "key for serving ssl" # Optional
 ca: "a custom CA to include for SSL" # Optional
 ```
 

@@ -28,6 +28,8 @@ type File struct {
 	Routes    map[string]*Route                 `yaml:"routes"`
 	Reset     string                            `yaml:"reset"`
 	Status    string                            `yaml:"status"`
+	Cert      string                            `yaml:"cert"`
+	Key       string                            `yaml:"key"`
 	CA        string                            `yaml:"ca"`
 	proxies   map[string]*httputil.ReverseProxy `yaml:"-"`
 	transport *http.Transport                   `yaml:"-"`
