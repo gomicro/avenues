@@ -21,6 +21,7 @@ jobs:
 
     - name: Setup
       run: |
+        echo "::add-path::${GOBIN}"
         go get -u golang.org/x/lint/golint
 
     - name: Checkout
