@@ -1,0 +1,26 @@
+
+builds:
+- env:
+    - CGO_ENABLED=0
+
+  ldflags:
+    - -X "main.version={{ .Env.VERSION }}"
+
+  goos:
+    - darwin
+    - windows
+    - linux
+
+archives:
+  -
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+
+dockers:
+  -
+    goos: linux
+
+    goarch: amd64
+
+    image_templates:
+      - "gomicro/avenues:latest"
+      - "gomicro/avenues:{{ .Env.VERSION }}"
