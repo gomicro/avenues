@@ -39,6 +39,9 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
 
+    env:
+      GOPATH: ${{ github.workspace }}
+
     steps:
 
     - name: Install Go
