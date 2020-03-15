@@ -11,10 +11,16 @@ import (
 )
 
 var (
-	conf *config.File
+	conf    *config.File
+	version string
 )
 
 func configure() {
+	if version == "" {
+		version = "dev-local"
+	}
+	log.Infof("Avenues %v", version)
+
 	c, err := config.ParseFromFile()
 	if err != nil {
 		log.Fatalf("Failed to read config file: %v", err.Error())
