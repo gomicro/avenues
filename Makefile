@@ -24,12 +24,6 @@ all: test build
 build: ## Run the go build command
 	CGO_ENABLED=$(CGO_ENABLED) GOOS=$(GOOS) $(GOBUILD) -o $(APP)
 
-.PHONY: deploy
-deploy: ## Deploy the artifacts
-	@echo "Logging into Docker Hub"
-	-@echo "$(DOCKER_PASSWORD)" | docker login -u "$(DOCKER_USERNAME)" --password-stdin
-	@ext/goreleaser release
-
 .PHONY: clean
 clean: ## Clean out all generated items
 	-@$(GOCLEAN)
