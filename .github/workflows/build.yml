@@ -86,5 +86,6 @@ jobs:
     - name: GoReleaser
       uses: goreleaser/goreleaser-action@v1
       with:
+        workdir: ${{ github.workspace }}/src/github.com/${{ github.repository }}
         version: latest
         args: release --rm-dist
