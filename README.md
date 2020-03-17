@@ -1,5 +1,5 @@
 # Avenues
-[![Build Status](https://travis-ci.org/gomicro/avenues.svg)](https://travis-ci.org/gomicro/avenues)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/gomicro/avenues/Build/master)](https://github.com/gomicro/avenues/actions?query=workflow%3ABuild+branch%3Amaster)
 [![Go Reportcard](https://goreportcard.com/badge/github.com/gomicro/avenues)](https://goreportcard.com/report/github.com/gomicro/avenues)
 [![GoDoc](https://godoc.org/github.com/gomicro/avenues?status.svg)](https://godoc.org/github.com/gomicro/avenues)
 [![License](https://img.shields.io/github/license/gomicro/avenues.svg)](https://github.com/gomicro/avenues/blob/master/LICENSE.md)
