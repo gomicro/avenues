@@ -24,3 +24,6 @@ dockers:
     image_templates:
       - "gomicro/avenues:latest"
       - "gomicro/avenues:{{ .Env.VERSION }}"
+
+    extra_files:
+      - ext/probe
