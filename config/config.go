@@ -29,8 +29,11 @@ type File struct {
 	Reset     string                            `yaml:"reset"`
 	Status    string                            `yaml:"status"`
 	Cert      string                            `yaml:"cert"`
+	CertPath  string                            `yaml:"cert_path"`
 	Key       string                            `yaml:"key"`
+	KeyPath   string                            `yaml:"key_path"`
 	CA        string                            `yaml:"ca"`
+	CAPath    string                            `yaml:"ca_path"`
 	proxies   map[string]*httputil.ReverseProxy `yaml:"-"`
 	transport *http.Transport                   `yaml:"-"`
 }
@@ -66,6 +69,30 @@ func ParseFromFile() (*File, error) {
 	}
 
 	conf.proxies = make(map[string]*httputil.ReverseProxy)
+
+	if conf.KeyPath != "" {
+		key, err := ioutil.ReadFile(conf.KeyPath)
+		if err != nil {
+			return nil, fmt.Errorf("Failed to read Key from file: %v", err.Error())
+		}
+		conf.Key = string(key)
+	}
+
+	if conf.CertPath != "" {
+		cert, err := ioutil.ReadFile(conf.CertPath)
+		if err != nil {
+			return nil, fmt.Errorf("Ffailed to read Cert from file: %v", err.Error())
+		}
+		conf.Cert = string(cert)
+	}
+
+	if conf.CAPath != "" {
+		ca, err := ioutil.ReadFile(conf.CAPath)
+		if err != nil {
+			return nil, fmt.Errorf("Failed to read CA(s) from file: %v", err.Error())
+		}
+		conf.CA = string(ca)
+	}
 
 	pool := x509.NewCertPool()
 	if conf.CA != "" {

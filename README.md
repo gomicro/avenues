@@ -35,8 +35,11 @@ routes:
 reset: "/a/custom/path/for/reset" # Optional
 status: "/a/custom/path/for/status" # Optional
 cert: "cert for serving ssl" # Optional
+cert_path: "path to file containing cert" # Optional
 key: "key for serving ssl" # Optional
+key_path: "path to file containing key" # Optional
 ca: "a custom CA to include for SSL" # Optional
+ca_path: "path to file containing CA(.)(.)" # Optional
 ```
 
 ## Running
