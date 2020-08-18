@@ -2,11 +2,12 @@ package config_test
 
 import (
 	"fmt"
-	"github.com/gomicro/avenues/config"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
+
+	"github.com/gomicro/avenues/config"
 
 	. "github.com/franela/goblin"
 	. "github.com/onsi/gomega"
@@ -44,6 +45,16 @@ func TestConfig(t *testing.T) {
 				Expect(err).NotTo(BeNil())
 				Expect(err.Error()).To(ContainSubstring("Failed to read config file"))
 				Expect(c).To(BeNil())
+			})
+
+			g.It("should parse a config file with path settings", func() {
+				os.Setenv("AVENUES_CONFIG_FILE", "./routes_other.yaml")
+
+				c, err := config.ParseFromFile()
+				Expect(err).To(BeNil())
+
+				Expect(c.CertPath).To(Equal("dummy.cert"))
+				Expect(c.Cert).To(ContainSubstring("-----BEGIN CERTIFICATE-----"))
 			})
 		})
 

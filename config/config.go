@@ -70,10 +70,26 @@ func ParseFromFile() (*File, error) {
 
 	conf.proxies = make(map[string]*httputil.ReverseProxy)
 
+	if conf.KeyPath != "" {
+		key, err := ioutil.ReadFile(conf.KeyPath)
+		if err != nil {
+			return nil, fmt.Errorf("Failed to read Key from file: %v", err.Error())
+		}
+		conf.Key = string(key)
+	}
+
+	if conf.CertPath != "" {
+		cert, err := ioutil.ReadFile(conf.CertPath)
+		if err != nil {
+			return nil, fmt.Errorf("Ffailed to read Cert from file: %v", err.Error())
+		}
+		conf.Cert = string(cert)
+	}
+
 	if conf.CAPath != "" {
 		ca, err := ioutil.ReadFile(conf.CAPath)
 		if err != nil {
-			return nil, fmt.Errorf("Failed to read CA(s) from file")
+			return nil, fmt.Errorf("Failed to read CA(s) from file: %v", err.Error())
 		}
 		conf.CA = string(ca)
 	}

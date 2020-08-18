@@ -2,7 +2,6 @@ package main
 
 import (
 	"crypto/tls"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"os"
@@ -40,24 +39,6 @@ func main() {
 	log.Infof("Listening on %v:%v", "0.0.0.0", "4567")
 
 	http.Handle("/", conf)
-
-	if conf.KeyPath != "" {
-		key, err := ioutil.ReadFile(conf.KeyPath)
-		if err != nil {
-			log.Fatalf("failed to read Key from file: %v", err.Error())
-			os.Exit(1)
-		}
-		conf.Key = string(key)
-	}
-
-	if conf.CertPath != "" {
-		cert, err := ioutil.ReadFile(conf.CertPath)
-		if err != nil {
-			log.Fatalf("failed to read Cert from file: %v", err.Error())
-			os.Exit(1)
-		}
-		conf.Cert = string(cert)
-	}
 
 	if conf.Key != "" && conf.Cert != "" {
 		log.Info("Serving with SSL")
