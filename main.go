@@ -71,9 +71,17 @@ func main() {
 			TLSConfig: cfg,
 		}
 
-		srv.ListenAndServeTLS("", "")
+		err = srv.ListenAndServeTLS("", "")
+		if err != nil {
+			log.Fatalf("something went horribly wrong: %v", err.Error())
+			os.Exit(1)
+		}
 	} else {
 		log.Info("Serving without SSL")
-		http.ListenAndServe("0.0.0.0:4567", nil)
+		err := http.ListenAndServe("0.0.0.0:4567", nil)
+		if err != nil {
+			log.Fatalf("something went horribly wrong: %v", err.Error())
+			os.Exit(1)
+		}
 	}
 }

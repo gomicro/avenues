@@ -173,12 +173,18 @@ func (f *File) handleReset(w http.ResponseWriter, req *http.Request) {
 		r.reset()
 	}
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("routes have been reset"))
+	_, err := w.Write([]byte("routes have been reset"))
+	if err != nil {
+		log.Errorf("internal error writing header: %v", err.Error())
+	}
 }
 
 func handleStatus(w http.ResponseWriter, req *http.Request) {
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("avenues is functioning"))
+	_, err := w.Write([]byte("avenues is functioning"))
+	if err != nil {
+		log.Errorf("internal error writing header: %v", err.Error())
+	}
 }
 
 func (f *File) backingURL(reqURL *url.URL) (*url.URL, error) {
