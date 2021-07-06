@@ -2,7 +2,6 @@ package config
 
 import (
 	"crypto/tls"
-	"crypto/x509"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -12,6 +11,7 @@ import (
 	"strings"
 
 	log "github.com/gomicro/ledger"
+	"github.com/gomicro/trust"
 	"gopkg.in/yaml.v2"
 )
 
@@ -94,9 +94,15 @@ func ParseFromFile() (*File, error) {
 		conf.CA = string(ca)
 	}
 
-	pool := x509.NewCertPool()
+	pool := trust.New()
+
+	certs, err := pool.CACerts()
+	if err != nil {
+		return nil, fmt.Errorf("Failed to get default CA cert pool")
+	}
+
 	if conf.CA != "" {
-		ok := pool.AppendCertsFromPEM([]byte(conf.CA))
+		ok := certs.AppendCertsFromPEM([]byte(conf.CA))
 		if !ok {
 			return nil, fmt.Errorf("Failed to append CA(s) to cert pool")
 		}
@@ -105,7 +111,7 @@ func ParseFromFile() (*File, error) {
 	conf.transport = &http.Transport{
 		MaxIdleConnsPerHost: 50,
 		MaxIdleConns:        50,
-		TLSClientConfig:     &tls.Config{RootCAs: pool},
+		TLSClientConfig:     &tls.Config{RootCAs: certs},
 	}
 
 	return &conf, nil

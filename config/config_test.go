@@ -9,12 +9,12 @@ import (
 
 	"github.com/gomicro/avenues/config"
 
-	. "github.com/franela/goblin"
+	"github.com/franela/goblin"
 	. "github.com/onsi/gomega"
 )
 
 func TestConfig(t *testing.T) {
-	g := Goblin(t)
+	g := goblin.Goblin(t)
 	RegisterFailHandler(func(m string, _ ...int) { g.Fail(m) })
 
 	g.Describe("Config File", func() {
