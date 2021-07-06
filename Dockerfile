@@ -2,7 +2,7 @@ FROM scratch
 MAINTAINER Daniel Hess <dan9186@gmail.com>
 
 ADD avenues avenues
-ADD ext/probe probe
+ADD --from=gomicro/probe /probe probe
 
 EXPOSE 4567
 
