@@ -5,11 +5,16 @@ builds:
 
   ldflags:
     - -X "main.version={{ .Env.VERSION }}"
+    - "-s -w"
 
   goos:
     - darwin
     - windows
     - linux
+
+  ignore:
+    - goos: darwin
+      goarch: 386
 
 archives:
   -
@@ -24,6 +29,3 @@ dockers:
     image_templates:
       - "gomicro/avenues:latest"
       - "gomicro/avenues:{{ .Env.VERSION }}"
-
-    extra_files:
-      - ext/probe
