@@ -16,6 +16,8 @@ GOFMT=$(GOCMD) fmt
 CGO_ENABLED ?= 0
 GOOS ?= $(shell uname -s | tr '[:upper:]' '[:lower:]')
 
+DEPLOY_VERSION := $(shell echo $${GITHUB_REF/refs\/tags\//})
+
 
 .PHONY: all
 all: test build
