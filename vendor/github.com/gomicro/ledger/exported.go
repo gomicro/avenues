@@ -2,6 +2,7 @@ package ledger
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"time"
@@ -66,22 +67,27 @@ func Threshold(level Level) {
 	std.threshold = level
 }
 
-// EndpointInfo wraps the given http handler function and logs details of the
-// endpoint at the Info threshold
-func EndpointInfo(fn http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		n := time.Now()
-		fn(w, r)
-		std.Infof("method=%v path=%v duration=%v", r.Method, r.URL.String(), time.Since(n))
-	}
+// Writer sets the writer for the exported logger
+func Writer(writer io.Writer) {
+	std.writer = writer
 }
 
-// EndpointDebug wraps the given http handler function and logs details of the
-// endpoint at the Debug threshold
-func EndpointDebug(fn http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+// EndpointInfo wraps the given http handler and logs details of the endpoint at
+// the Info threshold
+func EndpointInfo(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		n := time.Now()
-		fn(w, r)
+		next.ServeHTTP(w, r)
+		std.Infof("method=%v path=%v duration=%v", r.Method, r.URL.String(), time.Since(n))
+	})
+}
+
+// EndpointDebug wraps the given http handler and logs details of the endpoint
+// at the Debug threshold
+func EndpointDebug(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		n := time.Now()
+		next.ServeHTTP(w, r)
 		std.Debugf("method=%v path=%v duration=%v", r.Method, r.URL.String(), time.Since(n))
-	}
+	})
 }
