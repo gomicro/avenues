@@ -1,5 +1,5 @@
 FROM scratch
-MAINTAINER Daniel Hess <dan9186@gmail.com>
+MAINTAINER dev@gomicro.io
 
 ADD avenues avenues
 COPY --from=gomicro/probe /probe /probe
