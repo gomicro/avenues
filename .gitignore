@@ -1,2 +1,6 @@
-avenues
+# Directories
 dist/
+.DS_Store
+
+# Binaries
+avenues
