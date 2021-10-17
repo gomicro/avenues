@@ -46,8 +46,8 @@ ca_path: "path to file containing CA(.)(.)" # Optional
 Avenues is intended to be used in conjunction with local Docker testing of a service.
 
 ```
-docker pull gomicro/avenues
-docker run -it -v $PWD/routes.yaml:/routes.yaml gomicro/avenues
+docker pull ghcr.io/gomicro/avenues
+docker run -it -v $PWD/routes.yaml:/routes.yaml ghcr.io/gomicro/avenues
 ```
 
 # Versioning

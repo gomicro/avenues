@@ -4,17 +4,13 @@ builds:
     - CGO_ENABLED=0
 
   ldflags:
-    - -X "main.version={{ .Env.VERSION }}"
+    - -X "main.version={{ .Version }}"
     - "-s -w"
 
   goos:
     - darwin
     - windows
     - linux
-
-  ignore:
-    - goos: darwin
-      goarch: 386
 
 archives:
   -
@@ -27,5 +23,5 @@ dockers:
     goarch: amd64
 
     image_templates:
-      - "gomicro/avenues:latest"
-      - "gomicro/avenues:{{ .Env.VERSION }}"
+      - "ghcr.io/gomicro/avenues:latest"
+      - "ghcr.io/gomicro/avenues:{{ .Version }}"
